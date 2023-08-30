@@ -43,10 +43,7 @@ void WelcomeScreen()
 			print("[ERROR]: Unknown option selected.");
 			break;
 		}
-
 	} while (choice != '0');
-	
-
 }
 
 void SignUp()
@@ -80,9 +77,6 @@ void SignUp()
 		print("Your email address is already used");
 		system("pause");
 	}
-
-
-
 }
 
 void SignIn()
@@ -198,7 +192,7 @@ void MainMenu(Account account)
 			FlightScreen();
 			break;
 		case '2':
-			print("Entering view current tickets");
+			TicketScreen();
 			break;
 		default:
 			print("Unknown input, please select one of the options");
@@ -233,23 +227,24 @@ void LoadFlights(Flight emptyFlights[])
 
 void FlightScreen()
 {
-	system("CLS");
-	std::string destinations[7] = { "London", "New york", "Paris", "Sydney", "Los Angeles", "Dubai", "Beijing" };
-	print("View flights for these destinations: \n");
-
-	print("1. London");
-	print("2. New York");
-	print("3. Paris");
-	print("4. Sydney");
-	print("5. Los Angeles");
-	print("6. Dubai");
-	print("7. Beijing\n");
-
-	print("0. Exit");
+	
 
 	char choice;
 	do
 	{
+		system("CLS");
+
+		print("View flights for these destinations: \n");
+
+		print("1. London");
+		print("2. New York");
+		print("3. Paris");
+		print("4. Sydney");
+		print("5. Los Angeles");
+		print("6. Dubai");
+		print("7. Beijing\n");
+		print("0. Exit");
+		
 		choice = _getch();
 
 		switch (choice)
@@ -263,16 +258,22 @@ void FlightScreen()
 			SortFlights("London");
 			break;
 		case '2':
+			SortFlights("New York");
 			break;
 		case '3':
+			SortFlights("Paris");
 			break;
 		case '4':
+			SortFlights("Sydney");
 			break;
 		case '5':
+			SortFlights("Los Angeles");
 			break;
 		case '6':
+			SortFlights("Dubai");
 			break;
 		case '7':
+			SortFlights("Beijing");
 			break;
 		default:
 			print("Unknown input, please select one of the options");
@@ -292,11 +293,13 @@ void SortFlights(std::string destination)
 	readFile.open("flights.txt");
 
 	while (!readFile.eof()) {
-		
 		bool destinationMatch = false;
 		for (int i = 0; i < 4; i++)
 		{
 			std::getline(readFile, str, '|');
+
+			if (str[0] == '\n')
+				str.erase(0, 1);
 
 			if (i == 0 && destination == str)
 				destinationMatch = true;
@@ -318,9 +321,65 @@ void SortFlights(std::string destination)
 	}
 	readFile.close();
 
+	std::cout << "   " << std::setw(f) << std::left << "Destination" << std::setw(f) << std::left << "Price" << std::setw(f) << std::left << "Departure Time" << std::setw(f) << std::left << "Flight Code" << std::endl;
+
 	for (int i = 0; i < inc; i++)
 	{
-		std::cout << i + 1 << ". " << currentFlights[i].destination << " " << currentFlights[i].price << " " << currentFlights[i].departureTime << " " << currentFlights[i].flightCode << std::endl;
+		std::cout << i + 1 << ". " << std::setw(f) << std::left << currentFlights[i].destination << std::setw(f) << std::left << std::to_string(currentFlights[i].price) << std::setw(f) << std::left << currentFlights[i].departureTime << std::setw(f) << std::left << currentFlights[i].flightCode << std::endl;
 	}
-	std::cin.get();
+	print("0. Exit");
+	int choice;
+	do
+	{
+		choice = (int)_getch() - 48;
+		if (choice <= inc && choice > 0)
+		{
+			system("CLS");
+			currentAccount.SetTicket(currentFlights[choice - 1]);
+			system("pause");
+			break;
+		}
+	} while (choice != 0);
+	
+
+	//std::cin.get();
+}
+
+void TicketScreen()
+{
+	char choice;
+	do
+	{	
+		system("CLS");
+		currentAccount.GetTicket();
+		print("0. Exit");
+		choice = _getch();
+		
+		switch (choice)
+		{
+		case '0':
+			system("CLS");
+			print("Going back to Main Menu");
+			system("pause");
+			break;
+		case '1':
+			if (currentAccount.hasTicket)
+			{
+				system("CLS");
+				currentAccount.CancelTicket();
+				system("pause");
+				break;
+			}
+			else
+			{
+				print("Unknown input, please select one of the options");
+				break;
+			}
+		default:
+			print("Unknown input, please select one of the options");
+			system("pause");
+			break;
+		}
+	} while (choice != '0');
+	
 }
